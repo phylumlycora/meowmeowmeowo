@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Thing's That're Better Left Unsaid — Flipbook</title>
+
+  <!-- Fonts: cursive for pages (not bold), and a clean sans for overlay -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --pink: #ffb6c1;
+      --button-brown: #6d4c41;
+      --button-brown-hover: #8d6e63;
+      --paper: #fdfaf3;
+    }
+
+    html,body{height:100%;margin:0;}
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Dancing Script", cursive; /* main book cursive (not bold) */
+      font-weight: 400;
+      background-color: var(--pink);
+      /* cute dotted confetti pattern */
+      background-image:
+        radial-gradient(circle, #fff 2px, transparent 2px),
+        radial-gradient(circle, #fff 2px, transparent 2px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+    }
+
+    /* CONFIRMATION OVERLAY (uses a soft sans, non-bold) */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:1200;
+      background: rgba(255,182,193,0.94);
+      padding: 20px;
+      box-sizing: border-box;
+      text-align:center;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font-weight: 300;
+      color: #3b2b24;
+    }
+
+    #overlay .card {
+      max-width:640px;
+      width:100%;
+      background: rgba(255,255,255,0.95);
+      border-radius:14px;
+      padding:28px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    #overlay p {
+      margin: 8px 0 18px;
+      font-size:18px;
+      line-height:1.4;
+      font-weight: 300;
+    }
+
+    #overlay .buttons {
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    #overlay button {
+      padding:10px 18px;
+      border-radius:9px;
+      border:none;
+      cursor:pointer;
+      background: var(--button-brown);
+      color: white;
+      font-size:16px;
+      font-family: inherit;
+      font-weight: 400;
+    }
+
+    #overlay button:hover{ background: var(--button-brown-hover); }
+
+    /* BOOK */
+    .book-wrap {
+      width: 420px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+    }
+
+    .book {
+      width: 400px;
+      height: 520px;
+      perspective: 1600px;
+      position: relative;
+    }
+
+    .page {
+      width: 100%;
+      height: 100%;
+      background: var(--paper);
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: left center;
+      transition: transform 1s cubic-bezier(.2,.9,.2,1);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+      padding: 34px;
+      box-sizing: border-box;
+      font-size: 18px;
+      line-height: 1.45;
+      color: #2b211c;
+      overflow: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.04);
+      font-weight: 400; /* not bold */
+    }
+
+    /* Make the topmost pages stack visually */
+    .page::-webkit-scrollbar { width: 8px; height:8px; }
+    .page::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius:6px; }
+
+    /* Cover style — big centered cursive not bold */
+    .cover {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-size: 28px;
+      padding: 20px;
+      font-weight: 400; /* ensure not bold */
+      letter-spacing: 0.6px;
+    }
+
+    .cover .title {
+      max-width: 86%;
+      line-height: 1.05;
+      font-size: 36px;
+      font-weight: 400;
+    }
+
+    /* Controls shown after overlay */
+    .controls {
+      display:none;
+      margin-top:6px;
+      text-align:center;
+    }
+
+    button.nav {
+      padding:8px 16px;
+      border-radius:8px;
+      border:none;
+      cursor:pointer;
+      background: var(--button-brown);
+      color:white;
+      font-size:15px;
+      font-family: "Inter", sans-serif;
+      font-weight:400;
+    }
+    button.nav:hover{ background: var(--button-brown-hover); }
+
+    /* small helper: non-bold headings inside pages */
+    .page h3 { margin:0 0 8px 0; font-weight:400; font-size:20px; }
+
+    /* ensure overlay small messages aren't bold */
+    .muted { font-weight:300; font-size:15px; color:#5a3f36; }
+
+    @media (max-width:520px){
+      .book { width: 92vw; height: 72vh; }
+      .book-wrap { width:92vw; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay confirmation -->
+  <div id="overlay">
+    <div class="card" id="overlayCard">
+      <p style="font-size:20px; margin-bottom:6px;">Before we proceed... 💭</p>
+      <p style="font-size:18px; margin-bottom:18px;">Is your name <span style="font-weight:400">Daniel</span>?</p>
+
+      <div class="buttons">
+        <button onclick="firstConfirm('yes')">YESS, maem</button>
+        <button onclick="firstConfirm('no')">hell naw jigsaww</button>
+      </div>
+      <p class="muted" style="margin-top:14px;">(Choose wisely — something will come to ur bedroom tonight.)</p>
+    </div>
+  </div>
+
+  <!-- Book container -->
+  <div class="book-wrap">
+    <div class="book" id="book" aria-hidden="true" style="display:none;">
+      <!-- Cover: exactly as requested -->
+      <div class="page cover" style="z-index:8; overflow:hidden;">
+        <div class="title">things that're better left unsaid</div>
+      </div>
+
+      <!-- Page 1 -->
+      <div class="page" style="z-index:7;">
+        <div>
+          <p>I guess u can probably already tell what’s going to happen next so im going to keep things simple (well, sorta?) 😑</p>
+
+          <p>first and foremost, u’re not obligated to reply to this message. im also not going to force u to read ALOT. so im warning u rn, na if tinatamad kang basahin, stop right here. i don’t really care kung di mo ‘to babasahin, im just sending u this for MY peace of mind. okay soo na-bobother na kasi ako for the past 9 months (?) and its making me hate myself more. it was my new years resolution to let go of things that disrupt my internal peace; leave them in the past, and never ever look back. since 2025 is the year of the wood snakes, which signifies growth and introspection, i found it a v fitting time to finally start changing and live somewhat better and i want to take that seriously.</p>
+        </div>
+      </div>
+
+      <!-- Page 2 -->
+      <div class="page" style="z-index:6;">
+        <div>
+          <p>I realized i’ve been stuck in the same loop for too long, the constant negativity was sucking me. actually, things had been going smoothly—life’s great. I already let go of a lot of things that i deemed “unhealthy” to me (mostly mentally). I realized that I should be more kinder to myself bc if i don’t, who will, diba? I dont know basta it just felt like the right time to finally put my energy into growing, even if that means letting go of things that once mattered a lot to me. I yapped too hard, sorry 😞 I know u’re asking urself right now “why did this persom send a long msg ranting about their personal growth like i care” HAHAHA JOKE.</p>
+        </div>
+      </div>
+
+      <!-- Page 3 -->
+      <div class="page" style="z-index:5;">
+        <div>
+          <p>agghh im now addressing the elephant in the room. SOSOSOSOoo i have been reflecting and decided to just fuck everything and say what i’ve always been itching to saaayy. I like u a lot, Daniel. this isn’t a joke, ‘di kita pinag-ttripan if yan nasa isip mo rn. I just like u soo fucking much to the point na i can’t get u off my mind even if i try to. its not that i don’t try hard enough, i try with all my best pero wala, hindi talaga kita makalimutan kahit ano pang gawin ko.</p>
+
+          <p>I liked u ever since first year, so maybe that’s part of the reason why letting u go is harder than letting go of most things BAHZHAHS i don’t even know how it lasted this loonngg 😭 I guess it’s time na rin to tell you bc this shit has been haunting me, in the best and worst ways.</p>
+        </div>
+      </div>
+
+      <!-- Page 4 -->
+      <div class="page" style="z-index:4;">
+        <div>
+          <p>yk, i tried to brush it off a thousand times, but it alwys came back. i liked u. i liked everything abt u—every little part. u were my muse. the way u speak w softness fr makes my heart skip (RIZZ) even if u say the most diabolical things lol u somehow still manage to make them sound soothing 💔 ur awkward smiles whenever ure w ur friends. the way u look when you’re busy with something, i loved how passionate u are on things that you’re interested in. those faint breath and pauses when u laugh are just SOOOO. ik noticing things like that sounds ridiculous, but they hit different (u wouldn’t understand 😢✌️) for me, those little details were quietly loud.</p>
+        </div>
+      </div>
+
+      <!-- Page 5 -->
+      <div class="page" style="z-index:3;">
+        <div>
+          <p>agh i honestly can’t put everything im feeling into words (dictionaries need to invent more fr) but if i had to sum it all up, this is the first time i’ve ever felt this way about someone, like EVER 🤓</p>
+
+          <p>it’s absolutely wild how i gave so much meaning to someone who probably never asked for it. for the past three years (?), i’ve been silently grateful. u acc pulled me out of my art block without even knowing it. i’d draw and redraw ppl a hundred times, but u? u were the only one i never got tired of sketching. liking u wasn’t all rainbows and sparkles. most of the time, it made me feel like there’s a huge pit in my chest (i cant rly fathom why) i hated that feeling. i hated not recognizing MYSELF. and maybe that’s why liking u was also the worst. llmaaooaoa STILL! thank u for being my drive, my motivation (in a lot of things actually), in ways u probably never realized—thank u for existing. thank u for giving my bullshits the time they needed.</p>
+        </div>
+      </div>
+
+      <!-- Page 6 -->
+      <div class="page" style="z-index:2;">
+        <div>
+          <p>ALSO, i want u to remember that whenever u’re feeling insecure or jus feeling low in general, know that there’s alwys someone out there who admires and truly appreciates u, even from a distance. someone who’s been ur quiet supporter all along.</p>
+
+          <p>I get it if u find this uncomfortable, specially kasi naririnig ko rin sa iba na may kausap ka na po. if its true na u guys are tgt na talaga, stay strong po sainyo and i wish u guys the best in life hehe! 🤍 it’s not my intention to come between u two po. im telling u this rn because i want to finally put all this behind me. i’m also NOT interested in knowing whether u’re going to reject me because i didn’t intend to send this message expecting something, I JUST WANT PEACE and healing for MYSELF.</p>
+        </div>
+      </div>
+
+      <!-- Page 7 -->
+      <div class="page" style="z-index:1;">
+        <div>
+          <p>last thing, can u keep this between us lang? PLEASE PO. huwag niyo pong i-send or ipakita kahit kanino huhu 😭 kung may marinig lang po ako sa mga kaibigan niyo about this, ewan ko nalang. and if u dont know what to reply, ‘di ka naman obliged na mag-reply so no need. ‘wag ka ring masyadong ma-bother abt this bc there’re much more greater things to focus on. i just wanted to send it to u, okay na ako kung basahin mo lang.</p>
+
+          <p>kung curious ka kung sino ako, i suggest u to don’t even bother caring. kasi baka mamatay ka pa (curiosity killed the cat, HAHAHA gets? 😭) me confessing using a dummy acc says a lot about me already sooooo! lets just leave it at that.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Controls -->
+    <div class="controls" id="controls">
+      <button class="nav" onclick="prevPage()">⬅ Prev</button>
+      <button class="nav" onclick="nextPage()">Next ➡</button>
+    </div>
+  </div>
+
+  <script>
+    // Page flip logic: stacked pages rotate on Next/Prev
+    let current = 0;
+    const pages = Array.from(document.querySelectorAll('.page'));
+    const book = document.getElementById('book');
+    const controls = document.getElementById('controls');
+    const overlay = document.getElementById('overlay');
+    const overlayCard = document.getElementById('overlayCard');
+
+    // Stack z-index already set inline; ensure correct order in DOM
+    pages.forEach((p, i) => {
+      p.style.zIndex = pages.length - i;
+    });
+
+    function nextPage() {
+      if (current < pages.length) {
+        pages[current].style.transform = "rotateY(-180deg)";
+        current++;
+      }
+    }
+
+    function prevPage() {
+      if (current > 0) {
+        current--;
+        pages[current].style.transform = "rotateY(0deg)";
+      }
+    }
+
+    // Confirmation flow
+    let choice = null;
+    function firstConfirm(ans){
+      choice = ans;
+      overlayCard.innerHTML = `
+        <p style="font-size:20px; margin-bottom:10px;">ARE YOU SUREE???? :<<<</p>
+        <div class="buttons" style="margin-top:8px;">
+          <button onclick="finalConfirm(true)">HAI! im super sure..heh!</button>
+          <button onclick="finalConfirm(false)">uhm wait, n-no...</button>
+        </div>
+        <p class="muted" style="margin-top:12px;">(*/notices something OwO hehe)</p>
+      `;
+    }
+
+    function finalConfirm(sure){
+      if(sure && choice === 'yes'){
+        overlay.style.display = 'none';
+        book.style.display = 'block';
+        controls.style.display = 'block';
+        book.setAttribute('aria-hidden', 'false');
+      } else if (sure && choice === 'no'){
+        overlayCard.innerHTML = `<p style="font-size:18px;">Oh... maybe next time 💔</p>`;
+        setTimeout(()=> overlay.style.display = 'none',1800);
+      } else {
+        overlayCard.innerHTML = `<p style="font-size:18px;">Hehe okay, let’s start over 😳</p>`;
+        setTimeout(()=> location.reload(),1400);
+      }
+    }
+  </script>
+</body>
+</html>
